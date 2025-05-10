@@ -11,20 +11,21 @@ RaceVision/
 ├── scripts/
 │   ├── 1-DataPreparation.py          # Converts raw Ergast DB CSVs to per-race/lap CSVs
 │   ├── 2-RacePredictionPipeline.py   # Builds embeddings, .npy datasets, and defines & trains LSTM model
-├── db/                               # Raw and processed data directory (user‐specified)
-│   ├── races.csv                     # Metadata: race calendar
-│   ├── lap_times.csv                 # Raw lap‐time logs
-│   ├── results.csv                   # Race results per driver
-│   ├── qualifying.csv                # Qualifying session times
-│   ├── pit_stops.csv                 # Pit‐stop events (from 2012)
-│   ├── driver_standings.csv          # Championship standings per round
-│   ├── constructor_standings.csv     # Constructor standings per round
+├── db/                               # Processed data directory (user‐specified)
 │   ├── races/                        # Generated per‐race CSVs by script 1
 │   │   └── <year>/race<raceId>.csv
 │   ├── drivers_short.csv             # Unique driverId listing
 │   └── races_npy/                    # Generated .npy inputs/outputs by script 2
 │       └── <year>/{idx}_in.npy
 │                     {idx}_exp.npy
+├── ergast/                           # Raw data directory (data from Ergast DB)
+│   ├── races.csv                     # Metadata: race calendar
+│   ├── lap_times.csv                 # Raw lap‐time logs
+│   ├── results.csv                   # Race results per driver
+│   ├── qualifying.csv                # Qualifying session times
+│   ├── pit_stops.csv                 # Pit‐stop events (from 2012)
+│   ├── driver_standings.csv          # Championship standings per round
+│   └── constructor_standings.csv     # Constructor standings per round
 ├── sd/                               # Model checkpoints and final weights
 ├── README.md                         # (this file)
 ```
