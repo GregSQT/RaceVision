@@ -54,6 +54,7 @@ versionId = "1.0"
 
 # Directory where the raw CSV and processed data live
 db_dir = Path(r"E:\Dropbox\Informatique\Holberton\F1_Project\db")
+ergast_dir = Path(r"E:\Dropbox\Informatique\Holberton\F1_Project\db\ergast")
 
 
 # In[ ]:
@@ -85,11 +86,11 @@ def time_to_int(t):
 
 
 # Load metadata tables once for lookup
-races = pd.read_csv(db_dir / 'races.csv')
-circuits = pd.read_csv(db_dir / 'circuits.csv')
-drivers = pd.read_csv(db_dir / 'drivers.csv')
-constructors = pd.read_csv(db_dir / 'constructors.csv')
-status = pd.read_csv(db_dir / 'status.csv')
+races = pd.read_csv(ergast_dir / 'races.csv')
+circuits = pd.read_csv(ergast_dir / 'circuits.csv')
+drivers = pd.read_csv(ergast_dir / 'drivers.csv')
+constructors = pd.read_csv(ergast_dir / 'constructors.csv')
+status = pd.read_csv(ergast_dir / 'status.csv')
 
 def race_info(raceId):
   # Retrieve year, round, and circuitId for a given raceId
@@ -158,7 +159,7 @@ def status_info(id):
 
 
 # Creation of each year's folder
-years = range(2018, 2020)   #range(2001, 2020)
+years = range(2010, 2024)   #range(2001, 2024)
 for year in years:
   if not os.path.exists(db_dir / f'races_npy/{year}'):
         os.makedirs(db_dir / f'races_npy/{year}')
@@ -353,7 +354,7 @@ def driver_unbed(d_array):
 # In[ ]:
 
 
-years = range(2018, 2021)
+years = range(2010, 2024)
 for year in years:
     # Define the input directory for this year’s raw race CSVs
     race_dir = db_dir / 'races' / str(year)
@@ -362,7 +363,8 @@ for year in years:
         print(f"Skipping year {year} (no folder: {race_dir})")
         continue
 
-    # Define and create (if needed) the output directory for the year’s .npy files
+    # Define and create (if needed) the 
+    # put directory for the year’s .npy files
     out_dir = db_dir / 'races_npy' / str(year)
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -802,23 +804,29 @@ df2
 
 
 class RacePredictionModel(nn.Module):
-    def __init__(self, input_size, output_size, lstm_hids, lstm_layers, dropout):
+    def __init__(self, input_size, output_size, lstm_hiddens, lstm_layers, dropout):
+        # In our test : 4051         1200          1200           2         0.2
+        # Call the parent class constructor
+        # - this is required to properly initialize the module
+        # - it also allows us to use the `self` keyword to access module methods/attributes
+        # - this is a standard pattern for all PyTorch modules
         super(RacePredictionModel, self).__init__()
 
         # Store configuration parameters
         self.input_size = input_size        # dimensionality of each input vector
         self.lstm_layers = lstm_layers      # number of stacked LSTM layers
-        self.lstm_hids = lstm_hids          # hidden state size of each LSTM layer
+        self.lstm_hiddens = lstm_hiddens          # hidden state size of each LSTM layer
 
         # Define the LSTM module
-        # - input_size: number of features in the input at each time step
-        # - hidden_size: size of the hidden state
-        # - num_layers: how many LSTM layers to stack
-        # - dropout: dropout probability between layers (not applied to the last layer)
+        # - input_size: number of features in the input at each time step = Number of positions in the input line
+        # - output_size: number of features in the output at each time step = Number of positions in the output line
+        # - lstm_hiddens: size of the hidden state in the LSTM - each layer has 1 200 hidden units, so all of your hidden‐ and cell‐state tensors are shaped
+        # - lstm_layers: number of stacked LSTM layers - two stacked LSTMs is a common default for sequence-to-sequence or time-series tasks
+        # - dropout: probability of randomly (20% here) zeroing outputs to force the model to not rely too heavily on any single hidden‐unit or pattern in layer-1
         # - batch_first=True: input/output tensors shaped as (batch, seq, feature)
         self.lstm = nn.LSTM(
             input_size=input_size,
-            hidden_size=lstm_hids,
+            hidden_size=lstm_hiddens,
             num_layers=lstm_layers,
             dropout=dropout,
             batch_first=True
@@ -826,9 +834,12 @@ class RacePredictionModel(nn.Module):
 
         # Define a fully-connected layer to map from LSTM hidden state to output vector
         # - takes the LSTM hidden dimension and produces the desired output_size
-        self.fc = nn.Linear(lstm_hids, output_size)
+        self.fc = nn.Linear(lstm_hiddens, output_size)
 
         # Initialize the FC layer weights with Xavier (Glorot) uniform initialization
+        #   This initialization scheme keeps the scale of activations and gradients roughly 
+        #   the same across layers when you start training, which helps with convergence and 
+        #   avoids vanishing/exploding signals in deep networks.
         nn.init.xavier_uniform_(self.fc.weight.data)
 
         # Initialize LSTM parameters:
@@ -844,9 +855,9 @@ class RacePredictionModel(nn.Module):
         # Create zero-initialized hidden and cell states for the LSTM.
         # - batchsize: the number of parallel sequences to process in batch.
         # Returns a tuple (hidden_state, cell_state) each of shape
-        # (num_layers, batchsize, lstm_hids).
-        hidden_state = torch.zeros(self.lstm_layers, batchsize, self.lstm_hids)
-        cell_state = torch.zeros(self.lstm_layers, batchsize, self.lstm_hids)
+        # (num_layers, batchsize, lstm_hiddens).
+        hidden_state = torch.zeros(self.lstm_layers, batchsize, self.lstm_hiddens)
+        cell_state = torch.zeros(self.lstm_layers, batchsize, self.lstm_hiddens)
         return (hidden_state, cell_state)
 
     def forward(self, ins, prev_states=None):
@@ -889,7 +900,7 @@ sd_dir.mkdir(parents=True, exist_ok=True)
 # In[ ]:
 
 
-# Trains model on data from 2001 to 2024, 2020 is reserved for testing
+# Trains model on data from 2010 to 2024, 2024 is reserved for testing
 # Method 1
 # Training procedure:
 #   for each race:
@@ -898,9 +909,8 @@ sd_dir.mkdir(parents=True, exist_ok=True)
 #       feed input from dataset,
 #       calculate loss from output,
 #       back propagate,
-# In[32]:
 
-# Trains model on data from 2001 to 2019, 2020 is reserved for testing
+# Trains model on data from 2010 to 2024, 2024 is reserved for testing
 # Method 1: truncated back-propagation through time with state detachment
 
 # Model initialization:
@@ -909,11 +919,18 @@ sd_dir.mkdir(parents=True, exist_ok=True)
 #   - Output features: 2
 #   - Dropout: 0.2
 model = RacePredictionModel(4051, 1200, 1200, 2, 0.2).to(device)
-# Mean Squared Error loss for regression
+
+# Mean Squared Error (MSE) loss module is a standard regression loss function
 crit  = nn.MSELoss().to(device)
-# Adam optimizer with learning rate 0.001
+
+# Adam : default optimizer with learning rate 0.001
+# Learning rate scheduler: multiply LR by 0.2 every epoch ----------> Aggressive decay, makes sense for LSTM
 opt   = optim.Adam(model.parameters(), lr=0.001)
-# Learning rate scheduler: multiply LR by 0.2 every epoch
+
+#   - step_size: number of epochs before decay
+#       - step_size=1: decay every epoch    
+#   - gamma: multiplicative factor for decay
+#       - gamma=0.2: decay factor (0.2 means 80% reduction)
 sched = optim.lr_scheduler.StepLR(opt, step_size=1, gamma=0.2)
 
 ###
@@ -921,16 +938,16 @@ sched = optim.lr_scheduler.StepLR(opt, step_size=1, gamma=0.2)
 ###
 
 def run_train(model, ds, crit, opt, sched, device):
-    # Trains the model on available seasonal data (up to the year before 2020),
+    # Trains the model on available seasonal data (up to the year before 2024),
     # and displays a progress bar per race.
     model.train()
     total_loss, count = 0.0, 0
 
-    # Build list of (year, round) tuples for all races prior to 2020
+    # Build list of (year, round) tuples for all races prior to 2024
     race_list = []
     for y in ds.available_years:
-        # Stop when we reach 2020 (reserved for testing)
-        if y >= 2020:
+        # Stop when we reach 2024 (reserved for testing)
+        if y >= 2024:
             break
         ds.set_year(y)
         # ds.cur_year a bien été mis à jour par set_year
@@ -991,8 +1008,8 @@ def run_test(model, ds, crit, device):
     model.eval()
     total, count = 0, 0
 
-    # Choose test year: first available year >= 2020, otherwise fallback to latest year
-    test_years = [y for y in ds.available_years if y >= 2020]
+    # Choose test year: first available year >= 2024, otherwise fallback to latest year
+    test_years = [y for y in ds.available_years if y >= 2024]
     if test_years:
         year0 = test_years[0]
     else:
@@ -1063,7 +1080,6 @@ model.to(device)
 
 epochs = 1
 run_all(model, ds, crit, opt, sched, device, epochs)
-#run_all_2(model, ds, dl, 32, crit, opt, sched, 32, 10)
 
 
 # In[ ]:
@@ -1100,8 +1116,8 @@ print(f"🔄 Chargement du checkpoint : {latest.name}")
 # Switch the model to evaluation mode to disable dropout, batchnorm updates, etc.
 model.eval()
 
-# Set dataset to use the 2020 season and the 10th round
-ds.set_year(2020)
+# Set dataset to use the 2024 season and the 10th round
+ds.set_year(2024)
 ds.set_round(10)
 
 # Retrieve the input features and expected output for the 10th lap
@@ -1168,8 +1184,8 @@ print(f"🔄 Chargement du checkpoint : {latest.name}")
 model.load_state_dict(torch.load(latest, map_location=device))
 
 model.eval()
-# On se positionne sur la course n°30 de la saison 2020
-ds.set_year(2020)
+# On se positionne sur la course n°30 de la saison 2024
+ds.set_year(2024)
 ds.set_round(12)
 
 # On récupère le premier tour "p" et la vérité n
