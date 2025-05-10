@@ -57,7 +57,7 @@ RaceVision/
 
 3. **Run 1-DataPreparation**
 
-   * Filter races from 2018 onwards (excluding 2021)
+   * Filter races from 2010 onwards (excluding 2024)
    * Build `db/races/<year>/race<raceId>.csv` with one row per lap, columns for each driver’s grid position, lap time, pit flag, status, and championship standings.
    * Generate `db/drivers_short.csv` listing all unique driverId values.
    * Post-process pit flags to carry-over before-stop lap.
