@@ -53,8 +53,8 @@ versionId = "1.0"
 
 
 # Directory where the raw CSV and processed data live
-db_dir = Path(r"E:\Dropbox\Informatique\Holberton\F1_Project\db")
-ergast_dir = Path(r"E:\Dropbox\Informatique\Holberton\F1_Project\db\ergast")
+db_dir = Path(r"E:\Dropbox\Informatique\Holberton\RaceVision\db")
+ergast_dir = Path(r"E:\Dropbox\Informatique\Holberton\RaceVision\ergast")
 
 
 # In[ ]:
@@ -893,7 +893,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {device}")
 
 # Snapshot folder
-sd_dir = Path(r"E:\Dropbox\Informatique\Holberton\F1_Project\sd")
+sd_dir = Path(r"E:\Dropbox\Informatique\Holberton\RaceVision\sd")
 sd_dir.mkdir(parents=True, exist_ok=True)
 
 
