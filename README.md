@@ -18,6 +18,7 @@ RaceVision/
 │   └── races_npy/                    # Generated .npy inputs/outputs by script 2
 │       └── <year>/{idx}_in.npy
 │                     {idx}_exp.npy
+├── images/                           # plot display of the learning process evolution
 ├── ergast/                           # Raw data directory (data from Ergast DB)
 │   ├── races.csv                     # Metadata: race calendar
 │   ├── lap_times.csv                 # Raw lap‐time logs
@@ -27,6 +28,7 @@ RaceVision/
 │   ├── driver_standings.csv          # Championship standings per round
 │   └── constructor_standings.csv     # Constructor standings per round
 ├── sd/                               # Model checkpoints and final weights
+├── testing/                          # Metrics of the tests done
 ├── README.md                         # (this file)
 ```
 
