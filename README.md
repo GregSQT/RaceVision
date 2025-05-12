@@ -8,17 +8,13 @@ RaceVision is a deep learning pipeline for lap-by-lap prediction of Formula 1 ra
 
 ```
 RaceVision/
-├── scripts/
-│   ├── 1-DataPreparation.py          # Converts raw Ergast DB CSVs to per-race/lap CSVs
-│   ├── 2-RacePredictionPipeline.py   # Builds embeddings, .npy datasets, and defines & trains LSTM model
 ├── db/                               # Processed data directory (user‐specified)
 │   ├── races/                        # Generated per‐race CSVs by script 1
 │   │   └── <year>/race<raceId>.csv
 │   ├── drivers_short.csv             # Unique driverId listing
 │   └── races_npy/                    # Generated .npy inputs/outputs by script 2
 │       └── <year>/{idx}_in.npy
-│                     {idx}_exp.npy
-├── images/                           # plot display of the learning process evolution
+│                  {idx}_exp.npy
 ├── ergast/                           # Raw data directory (data from Ergast DB)
 │   ├── races.csv                     # Metadata: race calendar
 │   ├── lap_times.csv                 # Raw lap‐time logs
@@ -27,12 +23,17 @@ RaceVision/
 │   ├── pit_stops.csv                 # Pit‐stop events (from 2012)
 │   ├── driver_standings.csv          # Championship standings per round
 │   └── constructor_standings.csv     # Constructor standings per round
+├── images/                           # plot display of the learning process evolution
+├── notebooks/
+│   ├── 1-DataPreparation.py          # Converts raw Ergast DB CSVs to per-race/lap CSVs
+│   ├── 2-RacePrediction_GRU.py       # Builds embeddings, .npy datasets, and defines & trains GRU model
+│   └── 2-RacePrediction_LSTM.py      # Builds embeddings, .npy datasets, and defines & trains LSTM model
+├── presentation/                     # Powerpoint to explain how this project works
 ├── sd/                               # Model checkpoints and final weights
 ├── testing/                          # Metrics of the tests done
-├── README.md                         # (this file)
-```
+└── README.md                         # (this file)
 
----
+```
 
 ## 🚀 Quickstart
 
