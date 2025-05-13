@@ -23,7 +23,6 @@ RaceVision/
 │   ├── pit_stops.csv                 # Pit‐stop events (from 2012)
 │   ├── driver_standings.csv          # Championship standings per round
 │   └── constructor_standings.csv     # Constructor standings per round
-├── images/                           # plot display of the learning process evolution
 ├── notebooks/
 │   ├── 1-DataPreparation.py          # Converts raw Ergast DB CSVs to per-race/lap CSVs
 │   ├── 2-RacePrediction_GRU.py       # Builds embeddings, .npy datasets, and defines & trains GRU model
