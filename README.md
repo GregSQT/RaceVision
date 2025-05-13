@@ -28,6 +28,7 @@ RaceVision/
 │   ├── 2-RacePrediction_GRU.py       # Builds embeddings, .npy datasets, and defines & trains GRU model
 │   └── 2-RacePrediction_LSTM.py      # Builds embeddings, .npy datasets, and defines & trains LSTM model
 ├── presentation/                     # Powerpoint to explain how this project works
+│   └── images                        # Images used in the presentation
 ├── sd/                               # Model checkpoints and final weights
 ├── testing/                          # Metrics of the tests done
 └── README.md                         # (this file)
